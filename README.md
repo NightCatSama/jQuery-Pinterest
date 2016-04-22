@@ -1,6 +1,8 @@
 # jQuery-Pinterest
 基于jQuery编写的瀑布流图片墙插件
 
+[DEMO](http://nightcatsama.github.io/jQuery-Pinterest/)
+
 ###HTML
 ```html
 <link rel="stylesheet" href="css/Pinterest.css">

@@ -1,0 +1,100 @@
+/* *****遮罩层样式****** */
+.priterest-fade {
+    background-color: #000;
+    height: 100%;
+    opacity: 0.8;
+    width: 100%;
+    z-index: 9999;
+}
+/* *****瀑布流列样式****** */
+.pinterest-stream {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/* *****瀑布流图片块相关样式****** */
+.pinterest-img-wrap {
+    font-size: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .65);
+    border-radius: 5px;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", sans-serif;
+    transition: all .3s;
+}
+/* ------瀑布流图片hover样式------ */
+.pinterest-img-wrap:hover {
+    box-shadow: 0 0 13px 3px rgba(0, 0, 0, .65);
+}
+/* ------瀑布流首张图片距离顶部间隔( 不覆盖的话默认为gap参数值 )------ */
+.pinterest-img-wrap:first-child {
+    margin-top: 15px!important;
+}
+/* ------瀑布流大标题------ */
+.pinterest-img-title {
+    background-color: #000;
+    color: #FFF;
+    font-size: 20px;
+    height: 30px;
+    line-height: 30px;
+    opacity: .6;
+    overflow: hidden;
+    text-indent: 20px;
+    margin-top: -50px;
+    text-overflow: ellipsis;
+}
+/* ------瀑布流小标题------ */
+.pinterest-img-subtitle {
+    background-color: #000;
+    color: #FFF;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    opacity: .6;
+    overflow: hidden;
+    text-indent: 20px;
+    text-overflow: ellipsis;
+}
+
+/* ******全屏显示图片时相关样式****** */
+.priterest-wrap {
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+/* ------全屏显示图片样式( 未放大 )------ */
+.priterest-wrap .priterest-full-img {
+    max-height: 90%;
+    max-width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px 10px rgba(0, 0, 0, .5);
+    margin-top: 0;
+    opacity: 1;
+    transition: margin-top .5s, opacity .3s;
+}
+/* ------全屏显示图片出现效果------ */
+.priterest-wrap .priterest-full-img.priterest-off {
+    opacity: 0;
+    margin-top: 50px;
+}
+/* ------全屏显示图片样式( 放大 )------ */
+.priterest-wrap .priterest-full-img.priterest-big-img {
+    max-width: none;
+    max-height: none;
+}
+/* ------全屏显示时缩小按钮样式------ */
+.priterest-wrap .priterest-shrink-btn {
+    background-color: rgba(0, 0, 0, 0.35);
+    display: none;
+    height: 70px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}

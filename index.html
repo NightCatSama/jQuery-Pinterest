@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo</title>
+	<style>
+	    /*  ---------  插件外的样式  ----------  */
+		.wrap {
+			background-color: #eaeaea;
+			display: none;
+			margin:10px auto;
+		}
+		.wrap img {
+			cursor:pointer;
+		}
+		.control {
+			position: fixed;
+			z-index: 1;
+		}
+		button {
+			border: none;
+			background-color: #3498DB;
+			color:#FFF;
+			padding: 8px;
+			cursor: pointer;
+			border-radius: 8px;
+		}
+		button:hover {
+			background-color: #2F77B9;
+		}
+		.change-group {
+			position: fixed;
+			z-index: 1;
+			margin-top: 30px;
+		}
+		.change-group input {
+			border: 1px solid #3498DB;
+			background-color: #FFF;
+			color:#3498DB;
+			padding: 8px;
+			border-radius: 8px;
+		}
+		#loadingImg {
+			position: absolute;
+			top: 20px;
+			left:50%;
+		}
+	</style>
+	<link rel="stylesheet" href="css/Pinterest.css">
+</head>
+<body>
+<div class="control">
+	<button onclick="addImg();" id="add">增加一张图片</button>
+	<div class="change-group">
+		<input type="text" placeholder="输入删除图片的编号.." id="num">
+		<button onclick="DeleteImg()">删除</button>
+	</div>
+</div>
+
+<img src="images/loading.gif" alt="loading" id="loadingImg">
+<div class="wrap">
+	<img src="images/1.jpg" alt="image" data-title="Picture·1" data-subtitle="2016/4/15" >
+	<img src="images/2.jpg" alt="image" data-title="Picture·2" data-subtitle="2016/4/15" >
+	<img src="images/3.jpg" alt="image" data-title="Picture·3" data-subtitle="2016/4/15" >
+	<img src="images/4.jpg" alt="image" data-title="Picture·4" data-subtitle="2016/4/15" >
+	<img src="images/5.jpg" alt="image" data-title="Picture·5" data-subtitle="2016/4/15" >
+	<img src="images/6.jpg" alt="image" data-title="Picture·6" data-subtitle="2016/4/15" >
+	<img src="images/7.jpg" alt="image" data-title="Picture·7" data-subtitle="2016/4/15" >
+	<img src="images/8.jpg" alt="image" data-title="Picture·8" data-subtitle="2016/4/15" >
+</div>
+<script src="js/jquery-1.12.0.min.js"></script>
+<script src="js/Pinterest.js"></script>
+<script>
+//加载插件
+$(window).load(function(){
+	$('#loadingImg').remove();
+	$('.wrap').show();
+	$('.wrap').pinterest({
+		line: 4,
+		gap: 16
+	});
+});
+
+//获取初始图片长度
+var current_count = $('.wrap img').length;
+
+//添加图片
+function addImg(){
+	++current_count;
+	if(current_count > 52){
+		alert("图库已经空了Q~Q");
+	}
+	else {
+		$('.wrap').pinterest('add', 'images/' + current_count + '.jpg', "Picture·" + current_count, "2016/4/15");
+	}
+	scrollBottom(3);
+}
+
+//滚到底部
+function scrollBottom( speed ){
+	var ScrollTop = $(document).scrollTop();
+	var top = ScrollTop + speed;
+	$(document).scrollTop(top);
+	if(top < ($(document).height() - $(window).height())) {
+		setTimeout(function(){scrollBottom(speed);},0);
+	}
+}
+//删除图片
+function DeleteImg() {
+	var num = $('#num').val();
+	$('.wrap').pinterest('remove', num);
+}
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 <html lang="ch">
 <head>
 	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 	<title>Demo</title>
 	<style>
 	    /*  ---------  插件外的样式  ----------  */
@@ -25,20 +26,26 @@
 			cursor: pointer;
 			border-radius: 8px;
 		}
+		button:focus {
+			outline: none;
+		}
 		button:hover {
 			background-color: #2F77B9;
 		}
 		.change-group {
 			position: fixed;
 			z-index: 1;
-			margin-top: 30px;
 		}
 		.change-group input {
 			border: 1px solid #3498DB;
 			background-color: #FFF;
+			margin-top: 10px;
 			color:#3498DB;
 			padding: 8px;
 			border-radius: 8px;
+		}
+		.change-group input:focus {
+			outline: none;
 		}
 		#loadingImg {
 			position: absolute;
@@ -53,7 +60,9 @@
 	<button onclick="addImg();" id="add">增加一张图片</button>
 	<div class="change-group">
 		<input type="text" placeholder="输入删除图片的编号.." id="num">
-		<button onclick="DeleteImg()">删除</button>
+		<button onclick="DeleteImg()">删除</button><br>
+		<input type="text" placeholder="列数/[间距](PS:3 or 3/30).." id="line">
+		<button onclick="resetLine()">修改</button>
 	</div>
 </div>
 
@@ -77,7 +86,21 @@ $(window).load(function(){
 	$('.wrap').show();
 	$('.wrap').pinterest({
 		line: 4,
-		gap: 16
+		gap: 15,
+		responsive: [{
+			maxWidth: 1244,
+			minWidth: 769,
+			line: 3,
+			gap: 10
+		},{
+			maxWidth: 768,
+			line: 2,
+			gap: 20
+		},{
+			maxWidth: 400,
+			line: 1,
+			gap: 25
+		}]
 	});
 });
 
@@ -109,6 +132,23 @@ function scrollBottom( speed ){
 function DeleteImg() {
 	var num = $('#num').val();
 	$('.wrap').pinterest('remove', num);
+}
+
+//修改瀑布流列数
+function resetLine(){
+	var value = $('#line').val();
+	if(value.indexOf('/') > -1){
+		console.log(value);
+		var line = value.split('/')[0];
+		var gap = value.split('/')[1];
+		$('.wrap').pinterest('reset', {
+			line: line,
+			gap: gap
+		});
+	}
+	else {
+		$('.wrap').pinterest('reset', value);
+	}
 }
 </script>
 </body>

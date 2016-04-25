@@ -16,7 +16,7 @@
 .pinterest-img-wrap {
     font-size: 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, .65);
-    border-radius: 5px;
+    border-radius: 6px;
     overflow: hidden;
     font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", sans-serif;
     transition: all .3s;
@@ -41,6 +41,7 @@
     text-indent: 20px;
     margin-top: -50px;
     text-overflow: ellipsis;
+    transition: all .5s;
 }
 /* ------瀑布流小标题------ */
 .pinterest-img-subtitle {
@@ -52,9 +53,13 @@
     opacity: .6;
     overflow: hidden;
     text-indent: 20px;
+    border-radius: 0 0 6px 6px;
     text-overflow: ellipsis;
 }
-
+.pinterest-img-wrap:hover .pinterest-img-title {
+    margin-top: 0;
+    opacity: 1;
+}
 /* ******全屏显示图片时相关样式****** */
 .priterest-wrap {
     height: 100%;

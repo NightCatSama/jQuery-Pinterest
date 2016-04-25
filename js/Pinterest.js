@@ -1,4 +1,5 @@
-;(function(w, d, $, undefined) {
+;
+(function(w, d, $, undefined) {
 	/**
 	 * 拖拽图片状态
 	 * flag 可拖拽标志
@@ -6,12 +7,12 @@
 	 * left, top 拖拽位置
 	 */
 	var ImgStatus = {
-			flag: false,
-			startX: 0,
-			startY: 0,
-			left: 0,
-			top: 0
-		}
+		flag: false,
+		startX: 0,
+		startY: 0,
+		left: 0,
+		top: 0
+	}
 
 	/* ******************* 瀑布流构造函数 ********************* */
 	var Pinterest = function(elem, config) {
@@ -20,20 +21,54 @@
 		this.images = [];
 		this.config = config;
 		this.streams = [];
-		this.line = config.line ? config.line : 4;
-		this.gap = config.gap ? config.gap : 15;
-		this.width = config.width ? config.width : this.getWidth();
+		this.responsive = config.responsive ? config.responsive : [];
+		this.setState();
+
+		//为实例绑定事件
+		this.onEvent();
 	}
 
 	Pinterest.prototype = {
 		/**
-		 * 得到每列瀑布流宽度和图片宽度
+		 * 设置瀑布流基础属性
+		 */
+		setState: function() {
+			var len = this.responsive.length;
+			//判断是否设置响应式
+			if (len > 0) {
+				var WINDOW_WIDTH = $(w).width();
+				for (var i = len - 1; i >= 0; i--) {
+					var config = this.responsive[i];
+					var maxWidth = config.maxWidth ? config.maxWidth : 99999;
+					var minWidth = config.minWidth ? config.minWidth : 0;
+					if (maxWidth >= WINDOW_WIDTH && minWidth <= WINDOW_WIDTH) {
+						this.resetLine(config);
+						return false;
+					}
+				}
+			}
+			this.line = this.config.line ? this.config.line : 4;
+			this.gap = this.config.gap ? this.config.gap : 15;
+			this.width = this.config.width ? this.config.width : this.getWidth();
+		},
+		/**
+		 * 得到每列瀑布流的宽度
 		 * @return {number} [default: 200]
 		 */
 		getWidth: function() {
 			var width = this.$elem.width();
 			var index = this.line + 1;
-			return width ? (width - (this.gap * index)) / this.line : 200;
+			return width ? Math.floor((width - (this.gap * index)) / this.line) : 200;
+		},
+		/**
+		 * 设置每列瀑布流的宽度
+		 * @param {number} width [require]
+		 */
+		setWidth: function(width) {
+			var that = this;
+			$.each(this.streams, function(i, v) {
+				v.css('width', width);
+			});
 		},
 		/**
 		 * 得到当前最短的瀑布流
@@ -55,7 +90,7 @@
 		/**
 		 * 插件绑定事件
 		 */
-		onEvent: function(){
+		onEvent: function() {
 			//图片全屏显示
 			this.$elem.on('click', 'img', this.fullScreen);
 			//显示完整图片
@@ -67,6 +102,13 @@
 			$(d).on('mousemove', '.priterest-big-img', this.moveImg);
 			$(d).on('mouseup', '.priterest-big-img', this.dropImg);
 			$(d).on('mouseout', this.dropImg);
+			//跟随浏览器瀑布流缩放
+			$(w).resize(function() {
+				this.setState();
+				this.width = this.getWidth();
+				this.setWidth(this.width);
+				this.init();
+			}.bind(this));
 		},
 		/**
 		 * 设置图片下方标题
@@ -91,18 +133,19 @@
 		/* ******************* 瀑布流初始化 ********************* */
 		init: function() {
 			var that = this;
+			that.$elem.children().remove();
+			that.streams.length = 0;
 			for (var i = 0; i < this.line; i++) {
-				that.streams.push($("<div class='pinterest-stream' style='width:" + that.width + "px; margin-left:" + that.gap + "px; margin-bottom:" + that.gap + "px;'></div>"));
+				that.streams.push($("<div class='pinterest-stream' style='margin-left:" + that.gap + "px; margin-bottom:" + that.gap + "px;'></div>"));
 				that.streams[i].appendTo(this.$elem);
 			};
-			that.$imgs.width(that.width);
+			that.setWidth(that.width);
+			that.$imgs.css('width', '100%');
+
 			$.each(that.$imgs, function(i, v) {
 				var index = that.getMinStreams(); //得到当前最短的瀑布流
 				that.$imgs.eq(i).appendTo(that.streams[index]);
 			});
-
-			//为实例绑定事件
-			that.onEvent();
 
 			//图片下方显示标题( 遍历单个绑定 - 方便添加新图时片绑定 )
 			that.$imgs.each(function(i, v) {
@@ -114,14 +157,13 @@
 		 * @param { Array[ src, {title}, {subtitle} ] } parameter     [ src: 图片路径 | title: 主标题 | subtitle: 副标题 ]
 		 */
 		add: function(parameter) {
-			var $img = $("<img src=" + parameter[0] + " />");
+			var $img = $("<img src=" + parameter[0] + " style='width: 100%;'/>");
 			if (parameter[1]) {
 				$img.attr('data-title', parameter[1]);
 			}
 			if (parameter[2]) {
 				$img.attr('data-subtitle', parameter[2]);
 			}
-			$img.width(this.width);
 			this.$imgs.push($img[0]);
 			var index = this.getMinStreams();
 			$img.appendTo(this.streams[index]);
@@ -141,6 +183,22 @@
 			this.$imgs.eq(i - 1).parent().remove();
 		},
 		/**
+		 * 重设瀑布流数目
+		 * @param  {[ number or string or object ]} param
+		 */
+		resetLine: function(param) {
+			var config = param;
+			if (typeof config === 'number' || typeof config === 'string') {
+				this.line = parseInt(config);
+				this.width = this.getWidth();
+			} else {
+				this.line = config.line ? parseInt(config.line) : 4;
+				this.gap = config.gap ? parseInt(config.gap) : 15;
+				this.width = config.width ? parseInt(config.width) : this.getWidth();
+			}
+			this.init();
+		},
+		/**
 		 * 全屏显示图片
 		 */
 		fullScreen: function() {
@@ -158,10 +216,9 @@
 			$wrap.appendTo('body');
 
 			//当全屏图片小于等于完整图片时, 放大无效
-			if( $full_img[0].naturalWidth <= $full_img.width() ){
+			if ($full_img[0].naturalWidth <= $full_img.width()) {
 				$full_img.css('cursor', 'default');
-			}
-			else {
+			} else {
 				var $shrink_btn = $("<a class='priterest-shrink-btn'></a>");
 				$shrink_btn.css('cursor', setCursor('zoom-out'));
 				$full_img.css('cursor', setCursor('zoom-in'));
@@ -169,15 +226,15 @@
 			}
 
 			//将全屏图片出现效果交付给CSS样式, 方便插件使用者自定义
-			setTimeout(function(){
+			setTimeout(function() {
 				$full_img.removeClass('priterest-off');
-			},0);
+			}, 0);
 		},
 		/**
 		 * 显示完整图片
 		 */
 		fullImg: function() {
-			if (!$(this).hasClass('priterest-big-img') && this.width < this.naturalWidth ) {
+			if (!$(this).hasClass('priterest-big-img') && this.width < this.naturalWidth) {
 				$(this).css("cursor", setCursor('grab')).addClass('priterest-big-img');
 				$('.priterest-shrink-btn').show();
 			}
@@ -231,20 +288,20 @@
 		var prefix = v.indexOf('AppleWebKit') > -1 ? "-webkit-" : v.indexOf('Firefox') > -1 ? "-moz-" : ((v.indexOf('Trident') > -1 && v.indexOf('rv:11') > -1) || u_agent.indexOf('MSIE') > -1) ? 'IE' : '';
 
 		return setCursor = function(prop) {
-		 	if( prop === 'grabbing' || prop === 'grab'){
-		 		if (prefix === 'IE') {
+			if (prop === 'grabbing' || prop === 'grab') {
+				if (prefix === 'IE') {
 					return "move";
 				} else {
 					return prefix + prop;
 				}
-		 	}
-		 	if( prop === 'zoom-in' || prop === 'zoom-out'){
-		 		if (prefix === 'IE') {
+			}
+			if (prop === 'zoom-in' || prop === 'zoom-out') {
+				if (prefix === 'IE') {
 					return "pointer";
 				} else {
 					return prop;
 				}
-		 	}
+			}
 		};
 	})();
 
@@ -276,7 +333,12 @@
 						}
 					case 'remove':
 						{
-							data.remove(parameter);
+							data.remove(parameter[0]);
+							break;
+						}
+					case 'reset':
+						{
+							data.resetLine(parameter[0]);
 							break;
 						}
 					default:
